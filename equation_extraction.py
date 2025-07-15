@@ -3,6 +3,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from PIL import Image
 import os
+import cv2
 
 load_dotenv()
 
@@ -44,7 +45,6 @@ class Solver:
         except Exception as e:
             print(f"Error solving equation: {e}")
             print("Trying with chat model...")
-            return None
         try:
             prompt = f"""
             You are a math expert specialized in solving equations.
