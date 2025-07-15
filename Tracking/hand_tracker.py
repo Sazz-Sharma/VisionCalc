@@ -48,7 +48,7 @@ class HandTracker:
             self.is_finger_extended(hand_landmarks, HAND_LANDMARKS['PINKY'])
         ])
         
-        fingertips_close = self._are_fingertips_close(hand_landmarks)
+        fingertips_close = self._are_fingertips_close(hand_landmarks, HAND_LANDMARKS['INDEX'], HAND_LANDMARKS['MIDDLE'])
         return fingers_extended and fingertips_close
     
     def draw_landmarks(self, frame, hand_landmarks):
@@ -67,7 +67,7 @@ class HandTracker:
         
         return np.degrees(np.arccos(cos_angle))
     
-    def are_fingertips_close(self, hand_landmarks, finger1_landmarks, finger2_landmarks):
+    def _are_fingertips_close(self, hand_landmarks, finger1_landmarks, finger2_landmarks):
         """Check if fingertips are close enough ="""
         base = hand_landmarks.landmark[finger1_landmarks[0]]
         tip1 = hand_landmarks.landmark[finger1_landmarks[3]]

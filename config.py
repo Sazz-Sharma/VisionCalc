@@ -15,7 +15,7 @@ GESTURE_THRESHOLDS = {
 
 
 DRAWING_CONFIG = {
-    'pen_color': (255, 0, 0),  # Blue
+    'pen_color': (255, 255, 255),  # Blue
     'pen_thickness': 3,
     'eraser_size': 30,
     'canvas_opacity': 0.7,
