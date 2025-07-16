@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from PIL import Image
 import os
 import cv2
+from pix2tex.cli import LatexOCR
+import numpy as np
 
 load_dotenv()
 
@@ -19,8 +21,19 @@ class Solver:
     def __init__(self):
         self.vision_model = genai.GenerativeModel('gemini-1.5-flash')
         self.chat_model = genai.GenerativeModel('gemini-1.5-flash')
+        self.latex_ocr = LatexOCR()
     
     def extract_equation(self, canvas):
+        try:
+            preprocessed_image = self._preprocess_for_latex_ocr(canvas)
+            pil_image = Image.fromarray(preprocessed_image)
+            latex_equation = self.latex_ocr(pil_image)
+            print("Extracted LaTeX Equation:", latex_equation)
+            return latex_equation.strip() if latex_equation else None
+        except Exception as e:
+            print(f"Error extracting equation: {e}")
+            return None
+            print("Trying with vision model...")            
         try:
             pil_image = Image.fromarray(cv2.cvtColor(canvas, cv2.COLOR_BGR2GRAY))
 
@@ -37,6 +50,29 @@ class Solver:
         except Exception as e:
             print(f"Error extracting equation: {e}")
             return None 
+        
+    def _preprocess_for_latex_ocr(self, canvas):
+        """Preprocess canvas for better LaTeXOCR results"""
+        # Convert to grayscale
+        if len(canvas.shape) == 3:
+            gray = cv2.cvtColor(canvas, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = canvas
+        
+        # Invert if needed (LaTeXOCR expects black text on white background)
+        if np.mean(gray) < 127:
+            gray = cv2.bitwise_not(gray)
+        
+        # Remove noise
+        gray = cv2.medianBlur(gray, 3)
+        
+        # Improve contrast
+        gray = cv2.equalizeHist(gray)
+        
+        # Convert back to RGB for PIL
+        rgb_image = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB)
+        
+        return rgb_image
     
     def solve_equation(self, equation):
         try:
